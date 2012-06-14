@@ -17,7 +17,7 @@
 
 # What does it do?
 # ================
-# It must add or remove virtual host directives from sites-available/ and sites-enable/.
+# It must add or remove virtual host directives from sites-available/ and sites-enabled/.
 # It uses echo, printf, grep, a2dissite and a2ensite comands.
 # =====================
 function addVirtualHost {
@@ -113,7 +113,6 @@ if [ $# -eq 0 ]; then
 	exit
 else
 	case $1 in
-# TODO Fill cases.
 		-a)
 			expected_args=4
 			if [ $# -ne $expected_args ]; then
