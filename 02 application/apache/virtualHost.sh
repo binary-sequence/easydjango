@@ -18,7 +18,7 @@
 # What does it do?
 # ================
 # It must add or remove virtual host directives from sites-available/ and sites-enable/.
-# It uses  comands.
+# It uses echo, printf, grep, a2dissite and a2ensite comands.
 # =====================
 function addVirtualHost {
 	virtualHostName=$1 # First argument is virtual host name.
@@ -61,10 +61,6 @@ function removeVirtualHost {
 		virtualHostFile=$apacheConfigurationDirectory"/sites-available/"$virtualHostName
 	fi
 	rm $virtualHostFile
-}
-function disableVirtualHost {
-	virtualHostName=$1 # First argument is virtual host name.
-	a2dissite $virtualHostName
 }
 function showVirtualHosts {
 	apacheConfigurationDirectory=$1 # First argument is apache configuration directory.
