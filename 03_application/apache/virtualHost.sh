@@ -24,6 +24,7 @@ function addVirtualHost {
 	virtualHostName=$1 # First argument is virtual host name.
 	port=$2 # Second argument is virtual host port.
 	apacheConfigurationDirectory=$3 # Third argument is apache configuration directory.
+	directoryRoot="/usr/local/www/"$virtualHostName"/" | tr '.' '_'
 	if [[ $apacheConfigurationDirectory =~ .*/$ ]]; then
 		virtualHostFile=$apacheConfigurationDirectory"sites-available/"$virtualHostName
 	else
@@ -33,22 +34,22 @@ function addVirtualHost {
 	echo "<VirtualHost *:"$port">" >> $virtualHostFile
 	echo "    ServerName "$virtualHostName >> $virtualHostFile
 	echo "" >> $virtualHostFile
-	echo "    DocumentRoot /usr/local/www/"$virtualHostName"/documents" >> $virtualHostFile
-	echo "    <Directory /usr/local/www/"$virtualHostName"/documents/>" >> $virtualHostFile
+	echo "    DocumentRoot "$directoryRoot"documents" >> $virtualHostFile
+	echo "    <Directory "$directoryRoot"documents/>" >> $virtualHostFile
 	echo "        AllowOverride None" >> $virtualHostFile
 	echo "        Order allow,deny" >> $virtualHostFile
 	echo "        Allow from all" >> $virtualHostFile
 	echo "    </Directory>" >> $virtualHostFile
 	echo "" >> $virtualHostFile
-	echo "    WSGIScriptAlias / /usr/local/www/"$virtualHostName"/"$virtualHostName"/wsgi.py" >> $virtualHostFile
-	echo "    <Directory /usr/local/www/"$virtualHostName"/>" >> $virtualHostFile
+	echo "    WSGIScriptAlias / "$directoryRoot`echo $virtualHostName | tr '.' '_'`"/wsgi.py" >> $virtualHostFile
+	echo "    <Directory "$directoryRoot">" >> $virtualHostFile
 	echo "        AllowOverride None" >> $virtualHostFile
 	echo "        Order allow,deny" >> $virtualHostFile
 	echo "        Allow from all" >> $virtualHostFile
 	echo "    </Directory>" >> $virtualHostFile
 	echo "" >> $virtualHostFile
-	echo "    ErrorLog /usr/local/www/"$virtualHostName"/logs/error.log" >> $virtualHostFile
-	echo "    CustomLog /usr/local/www/"$virtualHostName"/logs/access.log combined" >> $virtualHostFile
+	echo "    ErrorLog "$directoryRoot"logs/error.log" >> $virtualHostFile
+	echo "    CustomLog "$directoryRoot"logs/access.log combined" >> $virtualHostFile
 	echo "</VirtualHost>" >> $virtualHostFile
 	echo "" >> $virtualHostFile
 }
