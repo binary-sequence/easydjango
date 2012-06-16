@@ -71,26 +71,32 @@ else
 					showHelp
 				else
 					if [ $1 = '-a' ]; then
-						count=`grep -c "^Listen "$2"$" $3`
-						if [ $count -ne 0 ]; then
+						if [ `grep -c "^Listen "$2"$" $3` -ne 0 ]; then
 							echo "Apache was already listening on port "$2"."
 						else
 							addListenPort $2 $3
-							echo 'Apache is listening now on ports:'
-							sed -n -e '/^Listen /p' $3 | cut -f2 -d\ 
-							echo ""
-							echo "*WARNING*:Apache must be restarted before changes take effect."
+							if [ `grep -c "^Listen "$2"$" $3` -eq 1 ]; then
+								echo "Port $2 has been added."
+								echo "*WARNING*:Apache must be restarted before changes take effect."
+							else
+								echo "Error: port $2 has not been added."
+							fi
 						fi
 					else # if [ $1 = '-r' ]; then
-						count=`grep -c "^Listen .*$" $3`
-						if [ $count -eq 1 ]; then
-							echo "You cannot remove the last listen port. Add another listen port before."
+						if [ `grep -c "^Listen "$2"$" $3` -eq 0 ]; then
+							echo "Apache is not listening on port "$2"."
 						else
-							removeListenPort $2 $3
-							echo 'Apache is listening now on ports:'
-							sed -n -e '/^Listen /p' $3 | cut -f2 -d\ 
-							echo ""
-							echo "*WARNING*:Apache must be restarted before changes take effect."
+							if [ `grep -c "^Listen .*$" $3` -eq 1 ]; then
+								echo "You cannot remove the last listen port. Add another listen port before."
+							else
+								removeListenPort $2 $3
+								if [ `grep -c "^Listen "$2"$" $3` -eq 0 ]; then
+									echo "Port $2 has been removed."
+									echo "*WARNING*:Apache must be restarted before changes take effect."
+								else
+									echo "Error: port $2 has not been removed."
+								fi
+							fi
 						fi
 					fi
 				fi
