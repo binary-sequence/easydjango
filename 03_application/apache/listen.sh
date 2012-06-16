@@ -1,7 +1,9 @@
 #!/bin/bash
 # =====================
-# Listen.sh bash script
+# listen.sh bash script
 # =====================
+# Copyright (c) 2012 Sergio Lindo <sergiolindo.empresa@gmail.com>
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
