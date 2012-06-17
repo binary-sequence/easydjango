@@ -142,9 +142,12 @@ else
 							echo "Virtual host '"$2"' already exists."
 						else
 							addVirtualHost $2 $3 $4
-							showVirtualHosts $4
-							echo ""
-							echo "*WARNING*:Apache must be restarted before changes take effect."
+							if [ -f $hostsAvailable$2 ]; then
+								echo "Virtual host $2 has been added."
+								echo "*WARNING*:Apache must be restarted before changes take effect."
+							else
+								echo "Error: virtual host $2 has not been added."
+							fi
 						fi
 					fi
 				fi
@@ -158,7 +161,7 @@ else
 				exit
 			else
 				virtualHostName=$2 # Second argument is virtual host name.
-				a2dissite $virtualHostName
+				a2dissite $virtualHostName | sed -e '/^To activate/d' -e 's/^.*service.*$/*WARNING*:Apache must be restarted before changes take effect./'
 			fi
 		;;
 		-e)
@@ -169,7 +172,7 @@ else
 				exit
 			else
 				virtualHostName=$2 # Second argument is virtual host name.
-				a2ensite $virtualHostName
+				a2ensite $virtualHostName | sed -e '/^To activate/d' -e 's/^.*service.*$/*WARNING*:Apache must be restarted before changes take effect./'
 			fi
 		;;
 		-r)
@@ -198,9 +201,12 @@ else
 							echo "Virtual host '"$2"' is enabled. You must disable it first."
 						else
 							removeVirtualHost $2 $3
-							showVirtualHosts $3
-							echo ""
-							echo "*WARNING*:Apache must be restarted before changes take effect."
+							if [ -f $hostsAvailable$2 ]; then
+								echo "Virtual host $2 has been removed."
+								echo "*WARNING*:Apache must be restarted before changes take effect."
+							else
+								echo "Error: virtual host $2 has not been removed."
+							fi
 						fi
 					fi
 				fi
