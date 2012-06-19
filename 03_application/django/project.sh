@@ -86,11 +86,37 @@ case $1 in
 				exit
 			else
 				if [ $1 = '-a' ]; then
-					createDjangoProject $2 $3
-					showDjangoProjects $3
+					if [[ ! $3 =~ .*/$ ]]; then
+						directoryProject=$3"/"
+					else
+						directoryProject=$3
+					fi
+					if [ -d $directoryProject$2 ]; then
+						echo "Error: Django project $2 already exists."
+					else
+						createDjangoProject $2 $3
+						if [ -d $directoryProject$2 ]; then
+							echo "Django project $2 has been created."
+						else
+							echo "Error: Django project $2 has not been created."
+						fi
+					fi
 				else #if [ $1 = '-r' ]; then
-					removeDjangoProject $2 $3
-					showDjangoProjects $3
+					if [[ ! $3 =~ .*/$ ]]; then
+						directoryProject=$3"/"
+					else
+						directoryProject=$3
+					fi
+					if [ ! -d $directoryProject$2 ]; then
+						echo "Error: Django project $2 does not exist."
+					else
+						removeDjangoProject $2 $3
+						if [ ! -d $directoryProject$2 ]; then
+							echo "Django project $2 has been removed."
+						else
+							echo "Error: Django project $2 has not been removed."
+						fi
+					fi
 				fi
 			fi
 		fi
