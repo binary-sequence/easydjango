@@ -27,6 +27,8 @@ function createDjangoProject {
 	projectsDirectory=$2 # Second argument is projects directory.
 	cd $projectsDirectory
 	django-admin.py startproject $projectName
+	stringPath='    os.path.join(os.path.dirname(__file__) , "documents").replace("\\\\","/").replace("mysite/mysite","mysite"),'
+	sed -i -e '1a\import os.path' -e '/^TEMPLATE_DIRS = ($/a\'"$stringPath" $projectName"/"$projectName"/settings.py"
 }
 function removeDjangoProject {
 	projectName=$1 # First argument is project name.
