@@ -61,9 +61,9 @@ function showDjangoProjects {
 	if [[ ! $projectsDirectory =~ .*/$ ]]; then
 		projectsDirectory=$projectsDirectory"/"
 	fi
-	printf "%23s    " "PROJECT NAME"; printf "%s\n" "APPLICATIONS";
+	printf "%-23s    " "PROJECT NAME"; printf "%s\n" "APPLICATIONS";
 	for project_directory in `ls $projectsDirectory`; do
-		printf "%23s    " $project_directory
+		printf "%-23s    " $project_directory
 		i=0
 		for project_app in `ls $projectsDirectory$project_directory`; do
 			if [ ! $project_app = "manage.py" ] && [ ! $project_app = $project_directory ] && [ ! $project_app = "documents" ] && [ ! $project_app = "favicon.ico" ] && [ ! $project_app = "logs" ]; then
@@ -155,16 +155,16 @@ case $1 in
 			if [ ! -d $3"/"$2 ]; then
 				createApp $2 $3
 				if [ -d $3"/"$2 ]; then
-					echo "The application $2 has been added to "`basename $3`" project."
+					echo "The application '$2' has been added to '"`basename $3`"' project."
 				else
-					echo "Error: The application $2 has not been added to "`basename $3`" project."
+					echo "Error: The application '$2' has not been added to '"`basename $3`"' project."
 				fi
 			else
 				removeApp $2 $3
 				if [ ! -d $3"/"$2 ]; then
-					echo "The application $2 has been removed from "`basename $3`" project."
+					echo "The application '$2' has been removed from '"`basename $3`"' project."
 				else
-					echo "Error: The application $2 has not been removed from "`basename $3`" project."
+					echo "Error: The application '$2' has not been removed from '"`basename $3`"' project."
 				fi
 			fi
 		fi
