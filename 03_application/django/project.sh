@@ -20,11 +20,11 @@
 # What does it do?
 # ================
 # It must create or remove django projects.
-# It uses cd, printf, ls and echo comands.
+# It uses cd, printf, ls, sed and echo comands.
 # =====================
 function createDjangoProject {
 	projectName=$1 # First argument is project name.
-	projectsDirectory=$2 # Second argument is projects directory.
+	projectsDirectory=$2 # Second argument is directory of all projects.
 	cd $projectsDirectory
 	django-admin.py startproject $projectName
 	stringPath='    os.path.join(os.path.dirname(__file__) , "documents").replace("\\\\","/").replace("'$projectName'/'$projectName'","'$projectName'"),'
@@ -32,12 +32,32 @@ function createDjangoProject {
 }
 function removeDjangoProject {
 	projectName=$1 # First argument is project name.
-	projectsDirectory=$2 # Second argument is projects directory.
+	projectsDirectory=$2 # Second argument is directory of all projects.
 	cd $projectsDirectory
 	rm -r $projectName
 }
+function createApp {
+	appName=$1 # First argument is app name.
+	projectPath=$2 # Second argument is project path.
+	if [[ ! $projectPath =~ .*/$ ]]; then
+		projectPath=$projectPath"/"
+	fi
+	cd $projectPath
+	python manage.py startapp $appName
+	sed -i -e '/^INSTALLED_APPS = ($/a\    "'"$appName"'",' $projectPath"/"`basename $projectPath`"/settings.py"
+}
+function removeApp {
+	appName=$1 # First argument is app name.
+	projectPath=$2 # Second argument is project path.
+	if [[ ! $projectPath =~ .*/$ ]]; then
+		projectPath=$projectPath"/"
+	fi
+	cd $projectPath
+	rm -r $appName
+	sed -i -e '/^    "'"$appName"'",$/d' $projectPath"/"`basename $projectPath`"/settings.py"
+}
 function showDjangoProjects {
-	projectsDirectory=$1 # First argument is projects directory.
+	projectsDirectory=$1 # First argument is directory of all projects.
 	if [[ ! $projectsDirectory =~ .*/$ ]]; then
 		projectsDirectory=$projectsDirectory"/"
 	fi
@@ -59,10 +79,12 @@ function showDjangoProjects {
 }
 function showHelp {
 	# If somebody use project.sh in a wrong way, it will show this help.
-	echo "Use: project.sh -option project_name projects_directory"
+	echo "Use: project.sh -option [project_name|app_name] [projects_directory|project_path]"
 	echo ""
 	echo "  -a"
 	echo "      Create project_name in projects_directory."
+	echo "  -m"
+	echo "      Modify project in project_path. It adds or removes application app_name. If the application exits, it will be removed. If it does not exist, it will be created."
 	echo "  -r"
 	echo "      Remove project_name from projects_directory."
 	echo "  -s"
@@ -71,6 +93,7 @@ function showHelp {
 	echo "  Example:"
 	echo "      project.sh -a www_mysite_es /usr/local/www/"
 	echo "      project.sh -s /usr/local/www/"
+	echo "      project.sh -m myapp /usr/local/www/www_mysite_es"
 	echo ""
 }
 # MAIN
@@ -119,6 +142,29 @@ case $1 in
 							echo "Error: Django project $2 has not been removed."
 						fi
 					fi
+				fi
+			fi
+		fi
+	;;
+	-m)
+		if [ ! -d $3 ]; then
+			echo "Third argument is not a valid directory: "$3"."
+			showHelp
+			exit
+		else
+			if [ ! -d $3"/"$2 ]; then
+				createApp $2 $3
+				if [ -d $3"/"$2 ]; then
+					echo "The application $2 has been added to "`basename $3`" project."
+				else
+					echo "Error: The application $2 has not been added to "`basename $3`" project."
+				fi
+			else
+				removeApp $2 $3
+				if [ ! -d $3"/"$2 ]; then
+					echo "The application $2 has been removed from "`basename $3`" project."
+				else
+					echo "Error: The application $2 has not been removed from "`basename $3`" project."
 				fi
 			fi
 		fi
