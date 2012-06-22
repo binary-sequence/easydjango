@@ -123,7 +123,7 @@ else
 				showHelp
 				exit
 			else
-				if [ ! -d $4 ]; then
+				if [ "$4" = "" ] || [ ! -d $4 ]; then
 					echo "Fourth argument is not a valid directory: "$4"."
 					showHelp
 					exit
@@ -182,7 +182,7 @@ else
 				showHelp
 				exit
 			else
-				if [ ! -d $3 ]; then
+				if [ "$3" = "" ] || [ ! -d $3 ]; then
 					echo "Third argument is not a valid directory: "$3"."
 					showHelp
 					exit
@@ -201,7 +201,7 @@ else
 							echo "Virtual host '"$2"' is enabled. You must disable it first."
 						else
 							removeVirtualHost $2 $3
-							if [ -f $hostsAvailable$2 ]; then
+							if [ ! -f $hostsAvailable$2 ]; then
 								echo "Virtual host $2 has been removed."
 								echo "*WARNING*:Apache must be restarted before changes take effect."
 							else
@@ -219,7 +219,7 @@ else
 				showHelp
 				exit
 			else
-				if [ ! -d $2 ]; then
+				if [ "$2" = "" ] || [ ! -d $2 ]; then
 					echo "Second argument is not a valid directory: "$2"."
 					showHelp
 					exit

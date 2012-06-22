@@ -106,7 +106,7 @@ case $1 in
 			showHelp
 			exit
 		else
-			if [ ! -d $3 ]; then
+			if [ "$3" = "" ] || [ ! -d $3 ]; then
 				echo "Third argument is not a valid directory: "$3"."
 				showHelp
 				exit
@@ -133,7 +133,7 @@ case $1 in
 					else
 						directoryProject=$3
 					fi
-					if [ ! -d $directoryProject$2 ]; then
+					if [ "$directoryProject$2" = "" ] || [ ! -d $directoryProject$2 ]; then
 						echo "Error: Django project $2 does not exist."
 					else
 						removeDjangoProject $2 $3
@@ -148,24 +148,30 @@ case $1 in
 		fi
 	;;
 	-m)
-		if [ ! -d $3 ]; then
-			echo "Third argument is not a valid directory: "$3"."
+		if [ "$3" = "" ] || [ ! -d $3 ] || [ ! -f "$3/manage.py" ]; then
+			echo "Third argument is not a valid project directory: "$3"."
 			showHelp
 			exit
 		else
-			if [ ! -d $3"/"$2 ]; then
-				createApp $2 $3
-				if [ -d $3"/"$2 ]; then
-					echo "The application '$2' has been added to '"`basename $3`"' project."
-				else
-					echo "Error: The application '$2' has not been added to '"`basename $3`"' project."
-				fi
+			if [ "$2" = "" ]; then
+				echo "Second argument is not a valid application name: $2."
+				showHelp
+				exit
 			else
-				removeApp $2 $3
 				if [ ! -d $3"/"$2 ]; then
-					echo "The application '$2' has been removed from '"`basename $3`"' project."
+					createApp $2 $3
+					if [ -d $3"/"$2 ]; then
+						echo "The application '$2' has been added to '"`basename $3`"' project."
+					else
+						echo "Error: The application '$2' has not been added to '"`basename $3`"' project."
+					fi
 				else
-					echo "Error: The application '$2' has not been removed from '"`basename $3`"' project."
+					removeApp $2 $3
+					if [ ! -d $3"/"$2 ]; then
+						echo "The application '$2' has been removed from '"`basename $3`"' project."
+					else
+						echo "Error: The application '$2' has not been removed from '"`basename $3`"' project."
+					fi
 				fi
 			fi
 		fi
