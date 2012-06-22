@@ -105,8 +105,7 @@ function apache_virtualHostMenu {
 			2) # 2. Remove_vitual_host
 				echo ""
 				read -p "    Type server's name: " serverName
-				read -p "    Type server's listen port: " serverListenPort
-				sudo bash $EASY_DJANGO_DIR"apache/virtualHost.sh" -r $serverName $serverListenPort $APACHE_CONF_DIR | sed -e 's/^/    /'
+				sudo bash $EASY_DJANGO_DIR"apache/virtualHost.sh" -r $serverName $APACHE_CONF_DIR | sed -e 's/^/    /'
 				read -p "Press enter to continue..." pause
 			;;
 			3) # 3. Enable_vitual_host
