@@ -62,19 +62,20 @@ function showDjangoProjects {
 		projectsDirectory=$projectsDirectory"/"
 	fi
 	printf "%-23s    " "PROJECT NAME"; printf "%s\n" "APPLICATIONS";
-	for project_directory in `ls $projectsDirectory`; do
-		printf "%-23s    " $project_directory
-		i=0
-		for project_app in `ls $projectsDirectory$project_directory`; do
-			if [ ! $project_app = "manage.py" ] && [ ! $project_app = $project_directory ] && [ ! $project_app = "documents" ] && [ ! $project_app = "favicon.ico" ] && [ ! $project_app = "logs" ]; then
+	for element in `ls $projectsDirectory`; do
+		if [ -f $projectsDirectory$element"/"$element"/__init__.py" ]; then
+			printf "\n%-23s    " $element
+			block=`sed -n -e '/^INSTALLED_APPS = ($/,/^)$/p' $projectsDirectory$element"/"$element"/settings.py" | sed -e '/^INSTALLED_APPS = ($/d' -e '/^)$/d' -e '/^    #/d'`
+			i=0
+			for project_app in $block; do
 				if [ $i -ne 0 ]; then
-					printf ", "
+					printf "\n%-23s    " " "
 				fi
-				printf "$project_app"
+				printf "%s" "$project_app"
 				let i=$i+1
-			fi
-		done
-		printf "\n"
+			done
+			printf "\n"
+		fi
 	done
 }
 function showHelp {
