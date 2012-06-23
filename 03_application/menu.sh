@@ -145,7 +145,7 @@ function apache_menu {
 	quitApacheMenu=0 # False
 	apacheMenuError=0 # False
 	while [ $quitApacheMenu = 0 ]; do
-		showMenu "Apache_configuration" "Listen_(port.conf)" "Virtual_hosts_(sites-available/)"
+		showMenu "Apache_configuration" "Listen_(port.conf)" "Virtual_hosts_(sites-available/)" "Restart_apache"
 		if [ $apacheMenuError = 0 ]; then
 			read -p " Type option: " apacheMenuOption
 		else
@@ -159,6 +159,10 @@ function apache_menu {
 			;;
 			2) # 2. Virtual_hosts_(sites-available/)
 				apache_virtualHostMenu
+			;;
+			3) # 3 Restart_apache
+				sudo /etc/init.d/apache2 restart | sed -e 's/^/    /'
+				read -p "Press enter to continue..." pause
 			;;
 			[qQ]*)
 				quitApacheMenu=1 # True
