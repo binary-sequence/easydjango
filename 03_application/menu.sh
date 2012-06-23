@@ -58,16 +58,22 @@ function apache_listenMenu {
 			listenMenuError=0 # False
 		fi
 		case $listenMenuOption in
-			1) # 1. Add_port
+			[12])
 				echo ""
 				read -p "    Type port number: " port
-				sudo bash $EASY_DJANGO_DIR"apache/listen.sh" -a $port $APACHE_CONF_DIR"ports.conf" | sed -e 's/^/    /'
-				read -p "Press enter to continue..." pause
-			;;
-			2) # 2. Remove_port
-				echo ""
-				read -p "    Type port number: " port
-				sudo bash $EASY_DJANGO_DIR"apache/listen.sh" -r $port $APACHE_CONF_DIR"ports.conf" | sed -e 's/^/    /'
+				if [ "$port" = "" ]; then
+					echo "    Error: Port number is empty."
+				else
+					if [[ ! "$port" =~ ^[1-9][0-9]*$ ]]; then
+						echo "    Port number is not a valid positive number: $port."
+					else
+						if [ $listenMenuOption = 1 ]; then # 1. Add_port
+							sudo bash $EASY_DJANGO_DIR"apache/listen.sh" -a $port $APACHE_CONF_DIR"ports.conf" | sed -e 's/^/    /'
+						else # 2. Remove_port
+							sudo bash $EASY_DJANGO_DIR"apache/listen.sh" -r $port $APACHE_CONF_DIR"ports.conf" | sed -e 's/^/    /'
+						fi
+					fi
+				fi
 				read -p "Press enter to continue..." pause
 			;;
 			[qQ]*)
@@ -95,29 +101,34 @@ function apache_virtualHostMenu {
 			virtualHostMenuError=0 # False
 		fi
 		case $virtualHostMenuOption in
-			1) # 1. Add_vitual_host
+			[1234])
 				echo ""
 				read -p "    Type server's name: " serverName
-				read -p "    Type server's listen port: " serverListenPort
-				sudo bash $EASY_DJANGO_DIR"apache/virtualHost.sh" -a $serverName $serverListenPort $APACHE_CONF_DIR | sed -e 's/^/    /'
-				read -p "Press enter to continue..." pause
-			;;
-			2) # 2. Remove_vitual_host
-				echo ""
-				read -p "    Type server's name: " serverName
-				sudo bash $EASY_DJANGO_DIR"apache/virtualHost.sh" -r $serverName $APACHE_CONF_DIR | sed -e 's/^/    /'
-				read -p "Press enter to continue..." pause
-			;;
-			3) # 3. Enable_vitual_host
-				echo ""
-				read -p "    Type server's name: " serverName
-				sudo bash $EASY_DJANGO_DIR"apache/virtualHost.sh" -e $serverName | sed -e 's/^/    /'
-				read -p "Press enter to continue..." pause
-			;;
-			4) # 4. Disable_vitual_host
-				echo ""
-				read -p "    Type server name: " serverName
-				sudo bash $EASY_DJANGO_DIR"apache/virtualHost.sh" -d $serverName | sed -e 's/^/    /'
+				if [ "$serverName" = "" ]; then
+					echo "    Error: Server's name is empty"
+				else
+					if [ $virtualHostMenuOption = 1 ]; then # 1. Add_vitual_host
+						read -p "    Type server's listen port: " serverListenPort
+						if [ "$serverListenPort" = "" ]; then
+							echo "    Error: Listen port is empty"
+						else
+							if [[ ! "$serverListenPort" =~ ^[1-9][0-9]*$ ]]; then
+								echo "    Port number is not a valid positive number: $serverListenPort."
+							else
+								sudo bash $EASY_DJANGO_DIR"apache/virtualHost.sh" -a $serverName $serverListenPort $APACHE_CONF_DIR | sed -e 's/^/    /'
+							fi
+						fi
+					fi
+					if [ $virtualHostMenuOption = 2 ]; then # 2. Remove_vitual_host
+						sudo bash $EASY_DJANGO_DIR"apache/virtualHost.sh" -r $serverName $APACHE_CONF_DIR | sed -e 's/^/    /'
+					fi
+					if [ $virtualHostMenuOption = 3 ]; then # 3. Enable_vitual_host
+						sudo bash $EASY_DJANGO_DIR"apache/virtualHost.sh" -e $serverName | sed -e 's/^/    /'
+					fi
+					if [ $virtualHostMenuOption = 4 ]; then # 4. Disable_vitual_host
+						sudo bash $EASY_DJANGO_DIR"apache/virtualHost.sh" -d $serverName | sed -e 's/^/    /'
+					fi
+				fi
 				read -p "Press enter to continue..." pause
 			;;
 			[qQ]*)
@@ -175,23 +186,31 @@ function django_menu {
 			djangoMenuError=0 # False
 		fi
 		case $djangoMenuOption in
-			1) # 1. Add_project
+			[123])
 				echo ""
 				read -p "    Type project name: " projectName
-				bash $EASY_DJANGO_DIR"django/project.sh" -a $projectName $DJANGO_PROJECTS_DIR | sed -e 's/^/    /'
-				read -p "Press enter to continue..." pause
-			;;
-			2) # 2. Remove_project
-				echo ""
-				read -p "    Type project name: " projectName
-				bash $EASY_DJANGO_DIR"django/project.sh" -r $projectName $DJANGO_PROJECTS_DIR | sed -e 's/^/    /'
-				read -p "Press enter to continue..." pause
-			;;
-			3) # 3. Add/remove_application
-				echo ""
-				read -p "    Type application name: " appName
-				read -p "    Type project name: " projectName
-				bash $EASY_DJANGO_DIR"django/project.sh" -m $appName $DJANGO_PROJECTS_DIR$projectName | sed -e 's/^/    /'
+				if [ "$projectName" = "" ]; then
+					echo "    Error: Project name is empty."
+				else
+					if [ $djangoMenuOption = 1 ]; then # 1. Add_project
+						bash $EASY_DJANGO_DIR"django/project.sh" -a $projectName $DJANGO_PROJECTS_DIR | sed -e 's/^/    /'
+					fi
+					if [ $djangoMenuOption = 2 ]; then # 2. Remove_project
+						bash $EASY_DJANGO_DIR"django/project.sh" -r $projectName $DJANGO_PROJECTS_DIR | sed -e 's/^/    /'
+					fi
+					if [ $djangoMenuOption = 3 ]; then # 3. Add/remove_application
+						read -p "    Type application name: " appName
+						if [ "$appName" = "" ]; then
+							echo "    Error: Application name is empty."
+						else
+							if [ ! -d $DJANGO_PROJECTS_DIR$projectName ]; then
+								echo "    Error: Project '$DJANGO_PROJECTS_DIR$projectName' does not exist."
+							else
+								bash $EASY_DJANGO_DIR"django/project.sh" -m $appName $DJANGO_PROJECTS_DIR$projectName | sed -e 's/^/    /'
+							fi
+						fi
+					fi
+				fi
 				read -p "Press enter to continue..." pause
 			;;
 			[qQ]*)
