@@ -22,7 +22,7 @@
 # It must show a console interface to user.
 # It uses echo, printf, read, clear, sed comands.
 # =====================
-EASYDJANGO_VERSION='v0.1'
+EASYDJANGO_VERSION='v0.2'
 APACHE_CONF_DIR='/etc/apache2/'
 DJANGO_PROJECTS_DIR='/usr/local/www/'
 EASY_DJANGO_DIR=`dirname $0`"/"
