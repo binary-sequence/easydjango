@@ -179,7 +179,7 @@ function django_menu {
 	quitDjangoMenu=0 # False
 	djangoMenuError=0 # False
 	while [ $quitDjangoMenu = 0 ]; do
-		showMenu "Django_configuration" "Add_project" "Remove_project" "Add/remove_application"
+		showMenu "Django_configuration" "Add_project" "Remove_project" "Add/remove_application" "Change_debug_mode"
 		bash $EASY_DJANGO_DIR"django/project.sh" -s $DJANGO_PROJECTS_DIR | sed -e 's/^/    /'
 		echo ""
 		if [ $djangoMenuError = 0 ]; then
@@ -190,7 +190,7 @@ function django_menu {
 			djangoMenuError=0 # False
 		fi
 		case $djangoMenuOption in
-			[123])
+			[1234])
 				echo ""
 				read -p "    Type project name: " projectName
 				if [ "$projectName" = "" ]; then
@@ -213,6 +213,18 @@ function django_menu {
 								bash $EASY_DJANGO_DIR"django/project.sh" -m $appName $DJANGO_PROJECTS_DIR$projectName | sed -e 's/^/    /'
 							fi
 						fi
+					fi
+					if [ $djangoMenuOption = 4 ]; then # 4. Change_debug_mode
+						read -p "    Type mode (on/off): " debugMode
+						if [ ! "$debugMode" = "" ]; then
+							if [[ "$debugMode" =~ ^[Oo][Nn]$ ]]; then
+								sed -i -e 's/^DEBUG = .*$/DEBUG = True/' $DJANGO_PROJECTS_DIR$projectName"/"$projectName"/settings.py"
+							fi
+							if [[ "$debugMode" =~ ^[Oo][Ff][Ff]$ ]]; then
+								sed -i -e 's/^DEBUG = .*$/DEBUG = False/' $DJANGO_PROJECTS_DIR$projectName"/"$projectName"/settings.py"
+							fi
+						fi
+						grep "^DEBUG = " $DJANGO_PROJECTS_DIR$projectName"/"$projectName"/settings.py" | sed -e 's/^/    /'
 					fi
 				fi
 				read -p "Press enter to continue..." pause
