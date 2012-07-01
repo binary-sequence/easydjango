@@ -179,7 +179,7 @@ function django_menu {
 	quitDjangoMenu=0 # False
 	djangoMenuError=0 # False
 	while [ $quitDjangoMenu = 0 ]; do
-		showMenu "Django_configuration" "Add_project" "Remove_project" "Add/remove_application" "Change_debug_mode"
+		showMenu "Django_configuration" "Add_project" "Remove_project" "Add_application" "Remove_application" "Change_debug_mode"
 		bash $EASY_DJANGO_DIR"django/project.sh" -s $DJANGO_PROJECTS_DIR | sed -e 's/^/    /'
 		echo ""
 		if [ $djangoMenuError = 0 ]; then
@@ -190,7 +190,7 @@ function django_menu {
 			djangoMenuError=0 # False
 		fi
 		case $djangoMenuOption in
-			[1234])
+			[12345])
 				echo ""
 				read -p "    Type project name: " projectName
 				if [ "$projectName" = "" ]; then
@@ -202,19 +202,31 @@ function django_menu {
 					if [ $djangoMenuOption = 2 ]; then # 2. Remove_project
 						bash $EASY_DJANGO_DIR"django/project.sh" -r $projectName $DJANGO_PROJECTS_DIR | sed -e 's/^/    /'
 					fi
-					if [ $djangoMenuOption = 3 ]; then # 3. Add/remove_application
-						read -p "    Type application name: " appName
-						if [ "$appName" = "" ]; then
-							echo "    Error: Application name is empty."
+					if [[ $djangoMenuOption =~ [34] ]]; then
+						if [ ! -d $DJANGO_PROJECTS_DIR$projectName ]; then
+							echo "    Error: Project '$DJANGO_PROJECTS_DIR$projectName' does not exist."
 						else
-							if [ ! -d $DJANGO_PROJECTS_DIR$projectName ]; then
-								echo "    Error: Project '$DJANGO_PROJECTS_DIR$projectName' does not exist."
+							read -p "    Type application name: " appName
+							if [ "$appName" = "" ]; then
+								echo "    Error: Application name is empty."
 							else
-								bash $EASY_DJANGO_DIR"django/project.sh" -m $appName $DJANGO_PROJECTS_DIR$projectName | sed -e 's/^/    /'
+								if [ $djangoMenuOption = 3 ]; then # 3. Add_application
+									if [ -d $DJANGO_PROJECTS_DIR$projectName"/"$appName ]; then
+										echo "    '$projectName' already have '$appName' application."
+									else
+										bash $EASY_DJANGO_DIR"django/project.sh" -m $appName $DJANGO_PROJECTS_DIR$projectName | sed -e 's/^/    /'
+									fi
+								else # 4. Remove_application
+									if [ ! -d $DJANGO_PROJECTS_DIR$projectName"/"$appName ]; then
+										echo "    '$projectName' have not '$appName' application."
+									else
+										bash $EASY_DJANGO_DIR"django/project.sh" -m $appName $DJANGO_PROJECTS_DIR$projectName | sed -e 's/^/    /'
+									fi
+								fi
 							fi
 						fi
 					fi
-					if [ $djangoMenuOption = 4 ]; then # 4. Change_debug_mode
+					if [ $djangoMenuOption = 5 ]; then # 5. Change_debug_mode
 						read -p "    Type mode (on/off): " debugMode
 						if [ ! "$debugMode" = "" ]; then
 							if [[ "$debugMode" =~ ^[Oo][Nn]$ ]]; then
